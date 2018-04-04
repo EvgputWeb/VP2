@@ -1,0 +1,81 @@
+{% include('_header.twig') %}
+
+    <style>
+        .wrapper main::after { opacity: 0.03; }
+    </style>
+
+    <!--*************************************************************************************-->
+    <div class="main"> <!-- доп.обёртка для прижатия футера -->
+
+        {% include('_nav.twig') %}
+
+	    <div class="content">
+            <div class="wrapper">
+                <main>
+                    <h1>Выпускной проект №2</h1>
+                    <h2>Регистрация</h2>
+
+                    <form action="" method="post" enctype="multipart/form-data">
+
+                        <div class="form-group">
+                            <label for="inputName">Имя</label>
+                            <input type="text" class="form-control" id="inputName" placeholder="Введите Ваше имя" name="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputAge">Возраст</label>
+                            <input type="text" class="form-control" id="inputAge" placeholder="Введите Ваш возраст" name="age">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputDescription">Описание</label>
+                            <textarea class="form-control" id="inputDescription" rows="2" placeholder="Напишите пару слов о себе" name="description"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <!-- <input type="hidden" name="MAX_FILE_SIZE" value="1048576" /> -->
+                            <label for="inputPhoto" class="col-sm-2 control-label">Фото</label>
+                            <input type="file" class="form-control" id="inputPhoto" name="photo" accept="image/*">
+                        </div>
+
+                        <!--
+                        <div class="form-group">
+                            <label for="inputEmail"><nobr>E-mail</nobr></label>
+                            <input type="email" class="form-control" id="inputEmail3" placeholder="E-mail" name="email" required>
+                        </div> -->
+
+                        <div class="form-group">
+                            <label for="inputLogin">Логин</label>
+                            <input type="text" class="form-control" id="inputLogin" placeholder="Придумайте логин" name="login" required>
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <div style="width: 49%; float:left;">
+                                <label for="inputPassword1">Пароль</label>
+                                <input type="password" class="form-control" id="inputPassword3" placeholder="Придумайте пароль" name="password">
+                            </div>
+                            <div style="width: 49%; float:right;">
+                                <label for="inputPassword2">Повторите пароль</label>
+                                <input type="password" class="form-control" id="inputPassword4" placeholder="Ещё раз тот же пароль" name="password-again">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="g-recaptcha" style="display: inline-block;" data-sitekey="{{ captchaSiteKey }}"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success" name="submit">Зарегистрироваться</button>
+                            <br><br>
+                            Зарегистрированы? <a href="/user/auth">Авторизируйтесь</a>
+                        </div>
+
+
+                    </form>
+                </main>
+            </div>
+		</div>
+    </div>
+    <!--*************************************************************************************-->
+
+{% include('_footer.twig') %}
