@@ -510,6 +510,17 @@ a.big-btn:hover {
     bottom: 2px;
 }
 
+.admin-control-area table {
+    width: calc(100% - 80px);
+    border: none;
+    border-collapse: collapse;
+}
+
+.admin-control-area table td {
+    border-bottom: 2px solid #c9d2e6;
+    vertical-align: top;
+    padding: 10px;
+}
 
 
 

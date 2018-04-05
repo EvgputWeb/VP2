@@ -22,8 +22,17 @@
 
 
                     <table>
+                        {% for file in files %}
+                            <tr>
+                                <td><img src="/admin/thumbs/{{ file.filename }}" alt=""></td>
+                                <td>{{ file.comment }}</td>
 
-
+                                <td width="250px">
+                                    <a class="btn btn-info" href="" data-id='{{ id }}'>Редактировать</a>
+                                    <a class="btn btn-danger" href="" id="deletelink_{{ id }} ?>" data-id='{{ id }}'>Удалить</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
 
                     </table>
 

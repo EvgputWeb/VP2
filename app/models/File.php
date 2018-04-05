@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Model;
+use Intervention\Image\ImageManagerStatic as Image;
 
 require_once 'User.php';
 
@@ -14,7 +15,7 @@ class File extends Model
     public static function getFilesListOf($userId)
     {
         $filesList = self::query()
-            ->where('user_id','=', $userId)->get()
+            ->where('user_id','=', $userId)->get(['filename','comment'])
             ->sortByDesc('filename')->toArray();
         return $filesList;
     }
@@ -34,17 +35,26 @@ class File extends Model
         $lastUploadedFile = array_values($lastUploadedFile);
 
         if (empty($lastUploadedFile)) {
-            $newFileName = 'photo_'.$userId.'_00001.jpg';
+            $newFileName = 'photo_'.$userId.'_00001';
         } else {
             $num = explode('_',$lastUploadedFile[0]['filename']);
             $newNum = filter_var($num[2], FILTER_SANITIZE_NUMBER_INT) + 1;
-            $newFileName = 'photo_'.$userId.'_'. str_pad($newNum, 5, '0', STR_PAD_LEFT) .'.jpg';
+            $newFileName = 'photo_'.$userId.'_'. str_pad($newNum, 5, '0', STR_PAD_LEFT);
         }
 
         self::query()->create([
             'user_id' => $userId,
             'filename' => $newFileName
         ]);
+
+        Image::configure(array('driver' => 'gd'));
+        $img = Image::make($tmpFileName);
+        $img->resize($img->width(), $img->height());
+        $img->save(Config::getPhotosFolder().'/'.$newFileName.'.jpg',90);
+        $img->resize(200, null, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+        $img->save(Config::getPhotosFolder().'/thumbs/'.$newFileName.'.jpg',90);
     }
 
     /*
