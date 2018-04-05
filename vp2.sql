@@ -12,26 +12,23 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 
--- Дамп структуры базы данных mvc
-DROP DATABASE IF EXISTS `mvc`;
-CREATE DATABASE IF NOT EXISTS `mvc` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `mvc`;
+-- Дамп структуры базы данных Loftschool_VP2
+DROP DATABASE IF EXISTS `Loftschool_VP2`;
+CREATE DATABASE IF NOT EXISTS `Loftschool_VP2` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `Loftschool_VP2`;
 
--- Дамп структуры для таблица mvc.users
+-- Дамп структуры для таблица Loftschool_VP2.users
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `login` varchar(50) NOT NULL,
+  `name` varchar(70) NOT NULL,
+  `age` smallint(5) unsigned DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
   `password_hash` varchar(255) DEFAULT NULL,
-  `name` varchar(50) DEFAULT NULL,
-  `age` smallint(6) unsigned DEFAULT NULL,
-  `description` varchar(700) DEFAULT NULL,
-  `email` varchar(70) NOT NULL,
-  `photo_link` varchar(70) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `login` (`login`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+  UNIQUE KEY `login` (`login`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- Экспортируемые данные не выделены.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

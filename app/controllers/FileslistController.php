@@ -19,7 +19,7 @@ class FileslistController extends Controller
         $viewData = [];
         $viewData['curSection'] = 'fileslist';
 
-        if ($userInfo['isLogined']) {
+        if ($userInfo['authorized']) {
             // Это авторизованный пользователь
             $viewData['login'] = $userInfo['login'];
             $viewData['name'] = $userInfo['name'];
@@ -48,7 +48,7 @@ class FileslistController extends Controller
             return;
         }
         $userInfo = User::getUserInfoByCookie();
-        if ($userInfo['isLogined']) {
+        if ($userInfo['authorized']) {
             // Это авторизованный пользователь - он имеет права на удаление
             // Вызываем у модели функцию удаления
             $deletePhotoResult = $this->model->deletePhoto($params['id']);

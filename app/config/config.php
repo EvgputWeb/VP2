@@ -3,7 +3,7 @@
 return [
     'db' => [
         'host' => 'localhost',
-        'dbname' => 'mvc',
+        'dbname' => 'Loftschool_VP2',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -11,7 +11,7 @@ return [
     ],
     'cookie' => [
         'cryptPassword' => 'IuJkLr34Dfb0196',
-        'liveTime' => 480
+        'liveTime' => 960
     ],
     'photosFolder' => APP . '/_photos_',
     'user' => [

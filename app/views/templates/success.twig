@@ -1,9 +1,5 @@
 {% include('_header.twig') %}
 
-    <style>
-        .wrapper main::after { opacity: 0.11; }
-    </style>
-
     <!--*************************************************************************************-->
     <div class="main"> <!-- доп.обёртка для прижатия футера -->
 
@@ -13,7 +9,9 @@
             <div class="wrapper">
                 <main>
                     <h1>Выпускной проект №2</h1>
-
+                    <p>
+                        {{ successMessage | raw }}
+                    </p>
                 </main>
             </div>
         </div>

@@ -22,7 +22,7 @@ require_once ROOT . '/vendor/autoload.php';
 Config::loadConfig();
 
 // Установка соединения с БД
-//Db::setConnection();
+Db::setConnection();
 
 // Запускаем Router
 Router::run();

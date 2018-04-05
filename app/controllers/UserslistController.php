@@ -21,7 +21,7 @@ class UserslistController extends Controller
         $viewData = [];
         $viewData['curSection'] = 'userslist';
 
-        if ($userInfo['isLogined']) {
+        if ($userInfo['authorized']) {
             // Это авторизованный пользователь
             $viewData['login'] = $userInfo['login'];
             $viewData['name'] = $userInfo['name'];
@@ -51,7 +51,7 @@ class UserslistController extends Controller
             return;
         }
         $userInfo = User::getUserInfoByCookie();
-        if ($userInfo['isLogined']) {
+        if ($userInfo['authorized']) {
             // Это авторизованный пользователь - он имеет права на удаление
 
             if ($userInfo['id'] == $params['id']) {
@@ -106,7 +106,7 @@ class UserslistController extends Controller
         } else {
             // Просто отображаем форму редактирования
             $userInfo = User::getUserInfoByCookie();
-            if ($userInfo['isLogined']) {
+            if ($userInfo['authorized']) {
                 // Это авторизованный пользователь
                 $viewData['login'] = $userInfo['login'];
                 $viewData['name'] = $userInfo['name'];
@@ -150,7 +150,7 @@ class UserslistController extends Controller
         } else {
             // Просто отображаем форму создания пользователя
             $userInfo = User::getUserInfoByCookie();
-            if ($userInfo['isLogined']) {
+            if ($userInfo['authorized']) {
                 // Это авторизованный пользователь
                 $viewData['login'] = $userInfo['login'];
                 $viewData['name'] = $userInfo['name'];

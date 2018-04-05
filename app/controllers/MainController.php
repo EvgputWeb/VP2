@@ -12,7 +12,7 @@ class MainController extends Controller
 
         $viewData = ['curSection' => ''];
 
-        if ($userInfo['isLogined']) {
+        if ($userInfo['authorized']) {
             $viewData['login'] = $userInfo['login'];
             $viewData['name'] = $userInfo['name'];
         }

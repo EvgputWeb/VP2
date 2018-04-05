@@ -7,22 +7,16 @@ class User extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    public static $userDataFields = ['name', 'age', 'description', 'email', 'login', 'password', 'password-again'];
+    public static $userDataFields = ['name', 'age', 'description', 'login', 'password', 'password-again'];
 
 
-    public function Register($userData, &$userId)
+    public function Register($userData)
     {
-        // Проверка 1: логин должен быть уникальным
+        // Проверка: логин должен быть уникальным
         $login = strtolower($userData['login']);
         $user = $this->query()->whereRaw('lcase(login) = ?', $login)->get(['id'])->toArray();
         if (!empty($user)) {
             return 'Пользователь с таким логином уже есть';
-        }
-        // Проверка 2: e-mail должен быть уникальным
-        $email = strtolower($userData['email']);
-        $user = $this->query()->whereRaw('lcase(email) = ?', $email)->get(['id'])->toArray();
-        if (!empty($user)) {
-            return 'Пользователь с таким e-mail уже есть';
         }
         // Нет такого пользователя. Создаём.
         $user = $this->query()->create([
@@ -30,10 +24,9 @@ class User extends Model
             'age' => intval($userData['age']),
             'description' => $userData['description'],
             'login' => $userData['login'],
-            'email' => $userData['email'],
             'password_hash' => password_hash($userData['password'], PASSWORD_BCRYPT)
         ]);
-        // Возвращаем true и отдаём userId (чтобы установить куку)
+        // Записали юзера в базу
         $userId = $user->id;
         // Если есть фотка, то помещаем её в папку для фоток с именем "photo_".$userId."jpg"
         if (isset($userData['photo_filename'])) {
@@ -43,24 +36,22 @@ class User extends Model
                 ]);
             }
         }
-        return true;
+        // Отдаём userId только что зарегистрированного пользователя
+        return intval($userId);
     }
 
 
-    public function Auth($userData, &$userId)
+    public function Auth($userData)
     {
         $login = strtolower($userData['login']);
         $user = $this->query()->whereRaw('lcase(login) = ?', $login)->get(['id', 'password_hash'])->toArray();
         if (empty($user)) {
             return 'Пользователь с таким логином не найден';
         }
-        // Есть пользователь с таким логином
-        // Проверяем пароль
+        // Логин найден - проверяем пароль
         if (password_verify($userData['password'], $user[0]['password_hash'])) {
-            // Успешная авторизация.
-            // Возвращаем true и отдаём userId (чтобы установить куку)
-            $userId = $user[0]['id'];
-            return true;
+            // Успешная авторизация - отдаём userId
+            return intval($user[0]['id']);
         } else {
             return 'Неверный пароль';
         }
@@ -94,13 +85,13 @@ class User extends Model
     public static function getUserInfoByCookie()
     {
         $userInfo = [];
-        $userInfo['isLogined'] = false;
+        $userInfo['authorized'] = false;
         if (!isset($_COOKIE['user_id'])) { // Это незалогиненный пользователь
             return $userInfo;
         }
-        // Это залогиненный пользователь.
+        // Это авторизованный пользователь.
         // Возвращаем его имя и логин, которые берём из базы
-        $userInfo['isLogined'] = true;
+        $userInfo['authorized'] = true;
 
         // Расшифровываем id пользователя из куки
         $cryptedUserId = $_COOKIE['user_id'];
@@ -111,7 +102,7 @@ class User extends Model
         if (empty($usrInf)) {
             // Упс... А пользователя такого нету...
             $userInfo = [];
-            $userInfo['isLogined'] = false;
+            $userInfo['authorized'] = false;
             return $userInfo;
         }
         return array_merge($userInfo, $usrInf);

@@ -29,7 +29,7 @@ class UserController extends Controller
             // Проверяем сначала прохождение капчи
             $captchaPassed = false;
             if (isset($params['g-recaptcha-response'])) {
-                $captchaPassed = $this->testCaptcha($params['g-recaptcha-response']);
+                $captchaPassed = $this->checkCaptcha($params['g-recaptcha-response']);
             }
             if (!$captchaPassed) {
                 $viewData['errorMessage'] = 'Не пройдена анти-бот проверка';
@@ -46,29 +46,31 @@ class UserController extends Controller
             $userData['password-again'] = trim($userData['password-again']);
 
             // Если есть фотка, то добавляем в данные пользователя имя загруженного файла
-            if ((isset($_FILES)) && (isset($_FILES['photo']))) {
+            if (isset($_FILES['photo'])) {
                 $userData['photo_filename'] = $_FILES['photo']['tmp_name'];
             }
 
-            // Тестируем параметры на корректность
-            $testParamsResult = $this->testRegisterParams($userData['login'], $userData['password'], $userData['password-again']);
+            // Проверяем параметры на корректность
+            $checkParamsResult = $this->checkRegisterParams($userData['login'], $userData['password'], $userData['password-again']);
 
-            if ($testParamsResult === true) {
+            if ($checkParamsResult === true) {
                 // Входные параметры - OK.  Обращаемся к модели пользователя - регистрируем его
-                $userRegisterResult = $this->model->Register($userData, $userId);
+                $userId = $this->model->Register($userData);
 
-                if ($userRegisterResult === true) {
+                if (is_int($userId)) {
                     setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
+
+                    // После сообщения об успешной регистрации - автоматически перейдём в админ панель через 3 секунды
+                    header('refresh: 3; url=/admin');
+
                     $viewData['successMessage'] = "Поздравляем! Регистрация прошла успешно!<br>Ваш логин: <b>{$userData['login']}</b>";
                     $this->view->render('success', $viewData);
-                    // Регистрация прошла успешно - посылаем письмо
-                    $this->sendEmail($userData['email'], $userData['name']);
                 } else {
-                    $viewData['errorMessage'] = $userRegisterResult;
+                    $viewData['errorMessage'] = (string)$userId;
                     $this->view->render('error', $viewData);
                 }
             } else {
-                $viewData['errorMessage'] = $testParamsResult;
+                $viewData['errorMessage'] = $checkParamsResult;
                 $this->view->render('error', $viewData);
             }
         }
@@ -89,7 +91,7 @@ class UserController extends Controller
             // Проверяем сначала прохождение капчи
             $captchaPassed = false;
             if (isset($params['g-recaptcha-response'])) {
-                $captchaPassed = $this->testCaptcha($params['g-recaptcha-response']);
+                $captchaPassed = $this->checkCaptcha($params['g-recaptcha-response']);
             }
             if (!$captchaPassed) {
                 $viewData['errorMessage'] = 'Не пройдена анти-бот проверка';
@@ -101,15 +103,17 @@ class UserController extends Controller
             $userData['password'] = isset($params['password']) ? trim($params['password']) : '';
 
             // Обращаемся к модели пользователя - авторизуем его
-            $userAuthResult = $this->model->Auth($userData, $userId);
+            $userId = $this->model->Auth($userData);
 
-            if ($userAuthResult === true) {
+            if (is_int($userId)) {
                 setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
+                // После приветствия - автоматически перейдём в админ панель через 3 секунды
+                header('refresh: 3; url=/admin');
                 $userInfo = User::getUserInfoById($userId);
                 $viewData['successMessage'] = "Привет, <b>{$userInfo['name']}</b> !";
                 $this->view->render('success', $viewData);
             } else {
-                $viewData['errorMessage'] = $userAuthResult;
+                $viewData['errorMessage'] = (string)$userId;
                 $this->view->render('error', $viewData);
             }
         }
@@ -122,7 +126,7 @@ class UserController extends Controller
             return;
         }
         $userInfo = User::getUserInfoByCookie();
-        if (!$userInfo['isLogined']) {
+        if (!$userInfo['authorized']) {
             // Не авторизованному - не отдаём
             header('HTTP/1.0 403 Forbidden');
             echo 'You are not authorised user!';
@@ -141,7 +145,7 @@ class UserController extends Controller
     }
 
 
-    private function testRegisterParams($login, $password, $passwordAgain)
+    private function checkRegisterParams($login, $password, $passwordAgain)
     {
         if (!is_string($login) || !is_string($password) || !is_string($passwordAgain)) {
             return 'Параметры должны быть строковыми';
@@ -164,7 +168,7 @@ class UserController extends Controller
     }
 
 
-    private function testCaptcha($response)
+    private function checkCaptcha($response)
     {
         $remoteIp = $_SERVER['REMOTE_ADDR'];
         $recaptcha = new ReCaptcha(Config::getCaptchaSecretKey());
@@ -175,8 +179,4 @@ class UserController extends Controller
         return false;
     }
 
-
-    private function sendEmail($email, $userName)
-    {
-    }
 }
