@@ -143,13 +143,13 @@ nav a:hover {
   position: relative;
   color: #767676;
   padding: 30px;
-  background-color: #f1f1c9;
+  background-color: #fff4dd;
 }
 
 .wrapper main::after {
     content: "";
     background-image: url(../img/php.png);
-    opacity: 0.03;
+    opacity: 0.01;
     top: 0;
     left: 0;
     bottom: 0;
@@ -304,7 +304,7 @@ form h2 {
     top: -25px;
     left: 50%;
     transform: translate(-50%, 0);
-    background-color: #f1f1c9;
+    background-color: #fff4dd;
     display: inline-block;
     padding: 0 15px;
     margin: 0;
@@ -338,7 +338,7 @@ form h2 {
 }
 
 .nav-admin {
-    background-color: #673AB7;
+    background-color: #3a3eb7;
     position: relative;
 }
 
@@ -391,3 +391,134 @@ form h2 {
     margin-left: 1px;
     margin-right: 12px;
 }
+
+.wrapper-admin {
+    background: #e3ecda;
+    flex-direction: column;
+    padding-top: 30px;
+}
+
+div.admin-user-info {
+    display: table;
+    border-bottom: 4px solid #c4ccdf;
+}
+
+div.admin-user-info div {
+    display: table-cell;
+    vertical-align: top;
+}
+div.admin-user-info div:last-child {
+    padding-right: 33px;
+}
+
+div.admin-user-info-photo {
+    width:280px;
+    height:300px;
+    text-align: center;
+}
+
+div.admin-user-info-data {
+    height: 268px;
+    border: 2px dashed #d1d5dc;
+    width: 100%;
+    display: block !important;
+    padding-left: 18px;
+    padding-top: 6px;
+    font-size: 27px;
+    color: #6d6d6d;
+    position: relative;
+}
+
+.admin-user-info-data p {
+    margin: 0;
+}
+
+.admin-edit-self-data {
+    display: inline-block;
+    background: #bedabe;
+    position: absolute;
+    bottom: 10px;
+    font-size: 18px;
+    text-decoration: none;
+    color: #7b9074;
+    padding: 4px 12px 6px;
+    right: 11px;
+}
+
+.admin-edit-self-data:hover {
+    outline: 1px solid green;
+    background: #70a770;
+    color: white;
+}
+
+.admin-control-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
+a.big-btn {
+    font-family: "PTSansBold", sans-serif;
+    font-weight: normal;
+    display: inline-block;
+    width: 400px;
+    padding: 19px;
+    background: #b1d3de;
+    margin-bottom: 20px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 23px;
+    color: #5c94ce;
+}
+
+a.big-btn:first-child {
+    margin-top: 45px;
+}
+
+a.big-btn:hover {
+    outline: 2px solid #5c94ce;
+    color: #255c96;
+    background-color: #8abfd0;
+}
+
+.admin-files-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 40px;
+    position: relative;
+}
+
+.admin-files-header h2 {
+    color: #8496bf;
+    font-size: 26px;
+    display: inline-block;
+}
+
+.admin-files-header form {
+    margin-top: 8px;
+}
+
+.admin-files-header::after {
+    content: "";
+    display: block;
+    width: calc(100% - 80px);
+    position: absolute;
+    border-bottom: 3px solid #c9d2e6;
+    bottom: 2px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

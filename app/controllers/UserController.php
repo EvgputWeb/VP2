@@ -108,7 +108,7 @@ class UserController extends Controller
             if (is_int($userId)) {
                 setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
                 // После приветствия - автоматически перейдём в админ панель через 3 секунды
-                header('refresh: 3; url=/admin');
+                header('refresh: 2; url=/admin');
                 $userInfo = User::getUserInfoById($userId);
                 $viewData['successMessage'] = "Привет, <b>{$userInfo['name']}</b> !";
                 $this->view->render('success', $viewData);
@@ -118,6 +118,15 @@ class UserController extends Controller
             }
         }
     }
+
+
+    public function actionLogout()
+    {
+        setcookie('user_id', '', time() - 5, '/', $_SERVER['SERVER_NAME']);
+        // После приветствия - автоматически перейдём в админ панель через 3 секунды
+        header('Location: /');
+    }
+
 
 
     public function actionPhoto(array $params)
@@ -143,6 +152,26 @@ class UserController extends Controller
         header("Content-Length: " . filesize($photoFilename));
         echo file_get_contents($photoFilename);
     }
+
+    public function actionMainPhoto()
+    {
+        $userInfo = User::getUserInfoByCookie();
+        if (!$userInfo['authorized']) { // Не авторизованному - не отдаём
+            header('HTTP/1.0 403 Forbidden');
+            echo 'You are not authorized user!';
+            return;
+        }
+        $photoFilename = Config::getPhotosFolder() . '/mainphoto_' . $userInfo['id'] . '.jpg';
+        if (!file_exists($photoFilename)) {
+            $photoFilename = Config::getPhotosFolder() . '/empty_user.jpg';
+        }
+        header("Content-Type: image/jpeg");
+        header("Content-Length: " . filesize($photoFilename));
+        echo file_get_contents($photoFilename);
+    }
+
+
+
 
 
     private function checkRegisterParams($login, $password, $passwordAgain)
