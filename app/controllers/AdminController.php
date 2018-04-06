@@ -65,10 +65,10 @@ class AdminController extends Controller
         if (!$userInfo['authorized']) {
             // Не авторизованному - не отдаём
             header('HTTP/1.0 403 Forbidden');
-            echo 'You are not authorised user!';
+            echo 'You are not authorized user!';
             return;
         }
-        // Нужно отдать картинку
+        // Нужно отдать эскиз картинки
         $photoFilename = Config::getPhotosFolder() . '/thumbs/' . $params['request_from_url'].'.jpg';
         if (file_exists($photoFilename)) {
             header("Content-Type: image/jpeg");
@@ -131,7 +131,7 @@ class AdminController extends Controller
         if (!$userInfo['authorized']) {
             // Не авторизованному - не отдаём
             header('HTTP/1.0 403 Forbidden');
-            echo 'You are not authorised user!';
+            echo 'You are not authorized user!';
             return;
         }
         // Нужно отдать картинку
@@ -169,5 +169,26 @@ class AdminController extends Controller
         }
     }
 
+
+    public function actionUsersList(array $params)
+    {
+        $this->checkAuth();
+
+        /*if (count($params) > 0) {
+            // Прилетели данные от пользователя
+            if (isset($params['submit']) && (!empty($_FILES['photo']['tmp_name']))) {
+                File::saveUploadedFile($this->userInfo['id'], $_FILES['photo']['tmp_name']);
+                unlink($_FILES['photo']['tmp_name']);
+                $this->viewData['files'] = File::getFilesListOf($this->userInfo['id']);
+                header('Location: /admin/myfiles'); // чтобы _POST и _FILES очистились
+                return;
+            }
+        } */
+
+        // Показываем список пользователей
+        $this->viewData['users'] = User::getUsersList();
+        $this->view->render('admin_userslist', $this->viewData);
+
+    }
 
 }

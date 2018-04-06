@@ -125,6 +125,12 @@ class User extends Model
             });
         }
         // Сохраняем в папку с фотками пользователей
+        if (!file_exists(Config::getPhotosFolder())) {
+            mkdir(Config::getPhotosFolder(), 0777);
+        }
+        if (!file_exists(Config::getPhotosFolder().'/thumbs')) {
+            mkdir(Config::getPhotosFolder().'/thumbs', 0777);
+        }
         $img->save(Config::getPhotosFolder().'/mainphoto_'. $userId .'.jpg',90);
         // Удаляем временный файл
         unlink($tmpFileName);
@@ -142,6 +148,9 @@ class User extends Model
         return true;
     }
 
-
+    public static function getUsersList()
+    {
+        return self::all()->sortBy('age')->toArray();
+    }
 
 }

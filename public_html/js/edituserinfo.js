@@ -23,7 +23,7 @@ $('body').on('click', 'a[href*=editselfdata]', function(e) {
     //return;
 
     swal({
-        title: "Редактирование данных",
+        title: "Информация о пользователе",
         showCancelButton: true,
         confirmButtonColor: '#619c34',
         confirmButtonText: 'Сохранить',
@@ -48,8 +48,6 @@ $('body').on('click', 'a[href*=editselfdata]', function(e) {
         }
     }).then(
         // Отсылаем новые данные в обработчик
-        //swal(JSON.stringify(result))
-
         result => {
             if (result.value) {
                 $.ajax({

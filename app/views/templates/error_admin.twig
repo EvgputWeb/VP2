@@ -8,13 +8,10 @@
         <div class="content">
             <div class="wrapper wrapper-admin">
 
-                {% include('common/_admin_info.twig') %}
-
-                <div class="admin-control-area">
-                    <a href="/admin/myfiles" class="big-btn">МОИ ФАЙЛЫ</a>
-                    <a href="/admin/userslist" class="big-btn">СПИСОК ПОЛЬЗОВАТЕЛЕЙ</a>
-
-                </div>
+                <p class="message error-message">
+                    Произошла ошибка:<br>
+                    <b>{{ errorMessage | raw }}</b>
+                </p>
 
             </div>
         </div>

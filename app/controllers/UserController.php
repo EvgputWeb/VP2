@@ -108,7 +108,7 @@ class UserController extends Controller
             if (is_int($userId)) {
                 setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
                 // После приветствия - автоматически перейдём в админ панель через 3 секунды
-                header('refresh: 1; url=/admin');
+                header('refresh: 2; url=/admin');
                 $userInfo = User::getUserInfoById($userId);
                 $viewData['successMessage'] = "Привет,&nbsp; <b>{$userInfo['name']}</b> !";
                 $this->view->render('success', $viewData);

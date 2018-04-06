@@ -55,6 +55,8 @@ abstract class Router
 
         if ($error) {
             require_once APP . '/controllers/ErrorController.php';
+            $controller = new ErrorController();
+            $controller->actionIndex();
             return;
         }
     }
