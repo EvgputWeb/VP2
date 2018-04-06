@@ -23,10 +23,6 @@ class File extends Model
 
     public static function saveUploadedFile($userId, $tmpFileName)
     {
-        if (trim($tmpFileName) == '') {
-            return;
-        }
-
         $lastUploadedFile = self::query()
             ->where('user_id','=', $userId)
             ->get(['filename'])->sortByDesc('filename')->take(1)->toArray();
@@ -57,24 +53,23 @@ class File extends Model
         $img->save(Config::getPhotosFolder().'/thumbs/'.$newFileName.'.jpg',90);
     }
 
-    /*
-    public function deletePhoto($userId)
+
+    public static function deleteFile($filename)
     {
-        // Удаляем фотку, если она есть
-        $photoFilename = Config::getPhotosFolder() . '/photo_' . intval($userId) . '.jpg';
+        // Удаляем запись в таблице
+        self::query()->where('filename', '=', $filename)->delete();
+        // Удаляем файл и thumb
+        $photoFilename = Config::getPhotosFolder() . '/' . $filename . '.jpg';
+        $thumbFilename = Config::getPhotosFolder() . '/thumbs/' . $filename . '.jpg';
         if (file_exists($photoFilename)) {
             if (unlink($photoFilename)) {
-                User::query()->find($userId)->update([
-                    'photo_link' => null
-                ]);
-                return true;
-            } else {
-                return 'Ошибка при удалении файла';
+                if (file_exists($thumbFilename)) {
+                    return unlink($thumbFilename);
+                }
             }
-        } else {
-            return 'Файл не найден';
         }
-    } */
+        return 'Ошибка при удалении файла';
+    }
 
 
 

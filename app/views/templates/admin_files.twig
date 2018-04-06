@@ -19,8 +19,6 @@
                         </form>
                     </div>
 
-
-
                     <table>
                         {% for file in files %}
                             <tr>
@@ -28,8 +26,9 @@
                                 <td>{{ file.comment }}</td>
 
                                 <td width="250px">
-                                    <a class="btn btn-info" href="" data-id='{{ id }}'>Редактировать</a>
-                                    <a class="btn btn-danger" href="" id="deletelink_{{ id }} ?>" data-id='{{ id }}'>Удалить</a>
+                                    <a href="/admin/viewfile" data-filename='{{ file.filename }}'>Просмотр</a>
+                                    <a href="/admin/commentfile" data-filename='{{ file.filename }}'>Комментарии</a>
+                                    <a href="/admin/deletefile" data-filename='{{ file.filename }}'>Удалить</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -42,6 +41,13 @@
         </div>
     </div>
     <!--*************************************************************************************-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="../../js/sweetalert2.min.js"></script>
+
+    <script src="../../js/fileslist.js"></script>
+    <script src="../../js/comment.js"></script>
 
 
 

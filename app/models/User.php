@@ -20,10 +20,10 @@ class User extends Model
         }
         // Нет такого пользователя. Создаём.
         $user = $this->query()->create([
-            'name' => $userData['name'],
+            'name' => htmlspecialchars($userData['name']),
             'age' => intval($userData['age']),
-            'description' => $userData['description'],
-            'login' => $userData['login'],
+            'description' => htmlspecialchars($userData['description']),
+            'login' => htmlspecialchars($userData['login']),
             'password_hash' => password_hash($userData['password'], PASSWORD_BCRYPT)
         ]);
         // Записали юзера в базу

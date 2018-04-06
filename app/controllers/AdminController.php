@@ -21,6 +21,7 @@ class AdminController extends Controller
         }
         // Авторизованный пользователь - получаем его данные
         // для передачи во view
+        $this->viewData['userId'] = $this->userInfo['id'];
         $this->viewData['login'] = $this->userInfo['login'];
         $this->viewData['name'] = $this->userInfo['name'];
     }
@@ -37,19 +38,19 @@ class AdminController extends Controller
     {
         $this->checkAuth();
 
-        if (count($params) == 0) {
-            // Показываем список файлов
-            $this->viewData['files'] = File::getFilesListOf($this->userInfo['id']);
-            $this->view->render('admin_files', $this->viewData);
-        } else {
+        if (count($params) > 0) {
             // Прилетели данные от пользователя
-            if (isset($params['submit']) && (isset($_FILES['photo']['tmp_name']))) {
-                File::saveUploadedFile($this->userInfo['id'],$_FILES['photo']['tmp_name']);
+            if (isset($params['submit']) && (!empty($_FILES['photo']['tmp_name']))) {
+                File::saveUploadedFile($this->userInfo['id'], $_FILES['photo']['tmp_name']);
                 unlink($_FILES['photo']['tmp_name']);
+                $this->viewData['files'] = File::getFilesListOf($this->userInfo['id']);
+                header('Location: /admin/myfiles');
+                return;
             }
-            $this->viewData['files'] = File::getFilesListOf($this->userInfo['id']);
-            header('Location: /admin/myfiles');
         }
+        // Показываем список файлов
+        $this->viewData['files'] = File::getFilesListOf($this->userInfo['id']);
+        $this->view->render('admin_files', $this->viewData);
     }
 
 
@@ -72,8 +73,31 @@ class AdminController extends Controller
             header("Content-Length: " . filesize($photoFilename));
             echo file_get_contents($photoFilename);
         }
-
     }
+
+
+    public function actionDeleteFile(array $params)
+    {
+        if (!isset($params['filename'])) {
+            echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+        $userInfo = User::getUserInfoByCookie();
+        if ($userInfo['authorized']) {
+            // Это авторизованный пользователь - он имеет права на удаление
+            // Вызываем у модели функцию удаления
+            $deleteFileResult = File::deleteFile($params['filename']);
+            if ($deleteFileResult === true) {
+                echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode(['result' => 'fail', 'errorMessage' => $deleteFileResult], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            // Пользователь не авторизован - он не имеет прав
+            echo json_encode(['result' => 'fail', 'errorMessage' => 'Вы не авторизованы. Нет прав на удаление'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
 
 
 
