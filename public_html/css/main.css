@@ -337,6 +337,19 @@ form h2 {
     border-color: #65885e;
 }
 
+p.message {
+    font-size: 24px;
+    line-height: 35px;
+    text-align: center;
+    padding-top: 11px;
+}
+p.success-message {
+    color: #5eab88;
+}
+p.error-message {
+    color: #bb8587;
+}
+
 .nav-admin {
     background-color: #3a3eb7;
     position: relative;
@@ -441,6 +454,21 @@ div.admin-user-info-data {
 .admin-user-info-data p {
     margin: 0;
 }
+
+.admin-user-info-data p.user-info-name {
+    font-family: "PTSansBold", sans-serif;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+.admin-user-info-data p.user-info-age {
+    margin-bottom: 8px;
+}
+
+.admin-user-info-data p.user-info-description {
+    color: #6a99a9;
+}
+
 
 .admin-edit-self-data {
     display: inline-block;
@@ -568,15 +596,6 @@ p.comment-to-file {
     color: #151ab1;
 }
 
-.file-controls a:focus {
+a:focus {
     outline: none;
 }
-
-
-
-
-
-
-
-
-

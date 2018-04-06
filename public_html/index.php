@@ -3,6 +3,9 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+mb_internal_encoding("UTF-8");
+mb_regex_encoding("UTF-8");
+
 define('ROOT', realpath(__DIR__ . '/..'));
 define('APP', ROOT . '/app');
 define('PUBLIC_HTML', ROOT . '/public_html');

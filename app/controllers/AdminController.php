@@ -24,6 +24,8 @@ class AdminController extends Controller
         $this->viewData['userId'] = $this->userInfo['id'];
         $this->viewData['login'] = $this->userInfo['login'];
         $this->viewData['name'] = $this->userInfo['name'];
+        $this->viewData['age'] = $this->userInfo['age'];
+        $this->viewData['description'] = mb_ereg_replace('\n', '<br>', $this->userInfo['description']);
     }
 
 
@@ -141,6 +143,31 @@ class AdminController extends Controller
         }
     }
 
+
+    public function actionEditSelfData(array $params)
+    {
+        if (!isset($params['userId']) || !isset($params['newName']) || !isset($params['newAge'])) {
+            echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+        $userInfo = User::getUserInfoByCookie();
+        if ($userInfo['authorized']) { // Это авторизованный пользователь - он имеет права на редактирование
+            if ($params['userId'] != $userInfo['id']) {  // Почему-то не совпало ...
+                echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);
+                return;
+            }
+            // Вызываем у модели функцию редактирования
+            $updateResult = User::updateInfo($params);
+            if ($updateResult === true) {
+                echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode(['result' => 'fail', 'errorMessage' => $updateResult], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            // Пользователь не авторизован - он не имеет прав
+            echo json_encode(['result' => 'fail', 'errorMessage' => 'Вы не авторизованы. Нет прав на редактирование данных'], JSON_UNESCAPED_UNICODE);
+        }
+    }
 
 
 }

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Eloquent\Model;
+use Intervention\Image\ImageManagerStatic as Image;
+
 
 class User extends Model
 {
@@ -28,13 +30,9 @@ class User extends Model
         ]);
         // Записали юзера в базу
         $userId = $user->id;
-        // Если есть фотка, то помещаем её в папку для фоток с именем "photo_".$userId."jpg"
+        // Если есть фотка, то помещаем её в папку для фоток с именем "mainphoto_".$userId."jpg"
         if (isset($userData['photo_filename'])) {
-            if (self::saveUserPhoto($userId, $userData['photo_filename'])) {
-                $this->query()->find($userId)->update([
-                    'photo_link' => "photo_$userId.jpg"
-                ]);
-            }
+            self::saveUserPhoto($userId, $userData['photo_filename']);
         }
         // Отдаём userId только что зарегистрированного пользователя
         return intval($userId);
@@ -72,11 +70,13 @@ class User extends Model
     public static function getUserInfoById($id)
     {
         $userInfo = [];
-        $user = static::query()->find($id, ['name', 'login']);
+        $user = static::query()->find($id, ['name', 'login', 'age', 'description']);
         if (!empty($user)) {
             $user = $user->toArray();
-            $userInfo['name'] = $user['name'];
-            $userInfo['login'] = $user['login'];
+            $userInfo['name'] = html_entity_decode($user['name']);
+            $userInfo['login'] = html_entity_decode($user['login']);
+            $userInfo['age'] = $user['age'];
+            $userInfo['description'] = html_entity_decode($user['description']);
         }
         return $userInfo;
     }
@@ -109,51 +109,39 @@ class User extends Model
     }
 
 
-    public static function saveUserPhoto($userId, $tmpFilename)
+    public static function saveUserPhoto($userId, $tmpFileName)
     {
-        if (empty($tmpFilename)) {
+        if (empty($tmpFileName)) {
             return false;
         }
-        $imgTypes = [IMAGETYPE_JPEG, IMAGETYPE_PNG];
-        $imgType = exif_imagetype($tmpFilename);
-        if (!in_array($imgType, $imgTypes)) {
-            // недопустимый тип файла
-            return false;
+        Image::configure(array('driver' => 'gd'));
+        $img = Image::make($tmpFileName);
+        // Вырезаем область в пропорции 3x4
+        $img->crop( round(0.75*$img->height()), $img->height());
+        $img->crop( $img->width(), round(1.33333*$img->width()));
+        if ($img->width()>300) {
+            $img->resize(300, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
         }
-        switch ($imgType) {
-            case IMAGETYPE_JPEG:
-                $img = imagecreatefromjpeg($tmpFilename);
-                break;
-            case IMAGETYPE_PNG:
-                $img = imagecreatefrompng($tmpFilename);
-                break;
-        }
-        if ($img === false) {
-            return false;
-        }
-        // обрезаем картинку - делаем квадрат
-        $size = min(imagesx($img), imagesy($img));
-        $img2 = imagecrop($img, ['x' => 0, 'y' => 0, 'width' => $size, 'height' => $size]);
-        if ($img2 === false) {
-            imagedestroy($img);
-            return false;
-        }
-        imagedestroy($img);
-        // масштабируем до размера 100x100
-        $imageScaled = imagescale($img2, 100);
-        if ($imageScaled === false) {
-            imagedestroy($img2);
-            return false;
-        }
-
         // Сохраняем в папку с фотками пользователей
-        $photoFilename = Config::getPhotosFolder() . '/photo_' . intval($userId) . '.jpg';
-        imagejpeg($imageScaled, $photoFilename, 90);
-        imagedestroy($imageScaled);
-
+        $img->save(Config::getPhotosFolder().'/mainphoto_'. $userId .'.jpg',90);
         // Удаляем временный файл
-        unlink($tmpFilename);
-
+        unlink($tmpFileName);
         return true;
     }
+
+
+    public static function updateInfo($newData)
+    {
+        self::query()->find($newData['userId'])->update([
+            'name' => htmlspecialchars($newData['newName']),
+            'age' => intval($newData['newAge']),
+            'description' => htmlspecialchars($newData['newDescription']),
+        ]);
+        return true;
+    }
+
+
+
 }

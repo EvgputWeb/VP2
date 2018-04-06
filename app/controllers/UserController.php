@@ -4,7 +4,6 @@ require_once 'Controller.php';
 require_once APP . '/models/User.php';
 
 use ReCaptcha\ReCaptcha;
-use PHPMailer\PHPMailer\PHPMailer;
 
 class UserController extends Controller
 {
@@ -61,15 +60,16 @@ class UserController extends Controller
                     setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
 
                     // После сообщения об успешной регистрации - автоматически перейдём в админ панель через 3 секунды
-                    header('refresh: 3; url=/admin');
-
-                    $viewData['successMessage'] = "Поздравляем! Регистрация прошла успешно!<br>Ваш логин: <b>{$userData['login']}</b>";
+                    header('refresh: 2; url=/admin');
+                    $viewData['successMessage'] = "Поздравляем! Регистрация прошла успешно!<br>Ваш логин:&nbsp; <b>{$userData['login']}</b>";
                     $this->view->render('success', $viewData);
                 } else {
+                    header('refresh: 2; url=/register');
                     $viewData['errorMessage'] = (string)$userId;
                     $this->view->render('error', $viewData);
                 }
             } else {
+                header('refresh: 2; url=/register');
                 $viewData['errorMessage'] = $checkParamsResult;
                 $this->view->render('error', $viewData);
             }
@@ -108,9 +108,9 @@ class UserController extends Controller
             if (is_int($userId)) {
                 setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
                 // После приветствия - автоматически перейдём в админ панель через 3 секунды
-                header('refresh: 2; url=/admin');
+                header('refresh: 1; url=/admin');
                 $userInfo = User::getUserInfoById($userId);
-                $viewData['successMessage'] = "Привет, <b>{$userInfo['name']}</b> !";
+                $viewData['successMessage'] = "Привет,&nbsp; <b>{$userInfo['name']}</b> !";
                 $this->view->render('success', $viewData);
             } else {
                 $viewData['errorMessage'] = (string)$userId;
@@ -153,6 +153,7 @@ class UserController extends Controller
         echo file_get_contents($photoFilename);
     }
 
+
     public function actionMainPhoto()
     {
         $userInfo = User::getUserInfoByCookie();
@@ -169,9 +170,6 @@ class UserController extends Controller
         header("Content-Length: " . filesize($photoFilename));
         echo file_get_contents($photoFilename);
     }
-
-
-
 
 
     private function checkRegisterParams($login, $password, $passwordAgain)
