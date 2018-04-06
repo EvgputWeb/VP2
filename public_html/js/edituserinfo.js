@@ -1,3 +1,13 @@
+function htmlUnescape(str){
+    return str
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+}
+
+
 $('body').on('click', 'a[href*=editselfdata]', function(e) {
     e.preventDefault();
 
@@ -7,7 +17,7 @@ $('body').on('click', 'a[href*=editselfdata]', function(e) {
     var descr = $(".admin-user-info-data .user-info-description").html();
 
     var regex = /<br\s*[\/]?>/gi;
-    descr = descr.replace(regex, "\n");
+    descr = htmlUnescape(descr.replace(regex, "\n"));
 
     //console.log(descr);
     //return;
