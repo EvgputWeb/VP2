@@ -45,7 +45,7 @@
 }
 
 html, body {
-  height: 100%;
+  height: 100% !important;
   font-family: "PTSansRegular", sans-serif;
   font-weight: normal;
 }
@@ -377,14 +377,23 @@ form h2 {
 }
 
 .admin-login {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+    margin-top: -4px;
+}
+
+.admin-login a {
+    display: inline-block !important;
+    margin: 0;
+    padding: 0;
     font-family: "PTSansRegular", sans-serif;
     font-weight: normal;
     color: lightblue;
-    font-size: 26px;
-    display: flex;
-    align-items: center;
-    margin-top: -2px;
-    margin-bottom: 4px;
+    font-size: 28px;
+}
+.admin-login a:hover {
+    background: none;
 }
 
 .admin-login img {
@@ -522,8 +531,46 @@ a.big-btn:hover {
     padding: 10px;
 }
 
+.swal2-container {
+  padding-bottom: 60px !important;
+}
 
+p.comment-to-file {
+    font-size: 18px;
+    color: #777777;
+    margin: 0;
+    margin-top: 2px;
+}
 
+.admin-control-area table td.file-controls {
+    text-align: right;
+    vertical-align: middle;
+    padding: 15px 0 17px 0;
+}
+
+.file-controls a {
+    display: inline-block;
+    text-decoration: none;
+    border: 1px solid #c4c9d6;
+    width: 135px;
+    text-align: center;
+    padding: 3px;
+    padding-bottom: 4px;
+    color: gray;
+    background-color: #ced3e0;
+    margin-bottom: 6px;
+    border-radius: 6px;
+}
+
+.file-controls a:hover {
+    border-color: #566ea7;
+    background-color: lightcyan;
+    color: #151ab1;
+}
+
+.file-controls a:focus {
+    outline: none;
+}
 
 
 

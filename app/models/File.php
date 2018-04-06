@@ -61,14 +61,25 @@ class File extends Model
         // Удаляем файл и thumb
         $photoFilename = Config::getPhotosFolder() . '/' . $filename . '.jpg';
         $thumbFilename = Config::getPhotosFolder() . '/thumbs/' . $filename . '.jpg';
+        $res = true;
         if (file_exists($photoFilename)) {
-            if (unlink($photoFilename)) {
-                if (file_exists($thumbFilename)) {
-                    return unlink($thumbFilename);
-                }
-            }
+            $res = $res && unlink($photoFilename);
         }
-        return 'Ошибка при удалении файла';
+        if (file_exists($thumbFilename)) {
+            $res = $res && unlink($thumbFilename);
+        }
+        $res = $res ?: 'Ошибка при удалении файла';
+        return $res;
+    }
+
+
+    public static function commentFile($filename, $comment)
+    {
+        self::query()->where('filename', '=', $filename)
+            ->update([
+                'comment' => htmlspecialchars($comment)
+            ]);
+        return true;
     }
 
 

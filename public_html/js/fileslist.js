@@ -4,12 +4,12 @@ $('body').on('click', 'a[href*=deletefile]', function(e){
     var filename = $(this).data('filename');
 
     swal({
-        title: 'Вы уверены?',
+        title: 'Хотите удалить этот файл?',
         text: 'Отменить операцию будет невозможно',
         type: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        /*cancelButtonColor: '#d33',*/
         confirmButtonText: 'Да, хочу удалить!',
         cancelButtonText: 'Отмена'
     }).then((result) => {

@@ -44,7 +44,7 @@ class AdminController extends Controller
                 File::saveUploadedFile($this->userInfo['id'], $_FILES['photo']['tmp_name']);
                 unlink($_FILES['photo']['tmp_name']);
                 $this->viewData['files'] = File::getFilesListOf($this->userInfo['id']);
-                header('Location: /admin/myfiles');
+                header('Location: /admin/myfiles'); // чтобы _POST и _FILES очистились
                 return;
             }
         }
@@ -83,8 +83,7 @@ class AdminController extends Controller
             return;
         }
         $userInfo = User::getUserInfoByCookie();
-        if ($userInfo['authorized']) {
-            // Это авторизованный пользователь - он имеет права на удаление
+        if ($userInfo['authorized']) { // Это авторизованный пользователь - он имеет права на удаление
             // Вызываем у модели функцию удаления
             $deleteFileResult = File::deleteFile($params['filename']);
             if ($deleteFileResult === true) {
@@ -99,6 +98,48 @@ class AdminController extends Controller
     }
 
 
+    public function actionCommentFile(array $params)
+    {
+        if (!isset($params['filename']) || !isset($params['comment'])) {
+            echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+        $userInfo = User::getUserInfoByCookie();
+        if ($userInfo['authorized']) { // Это авторизованный пользователь - он имеет права на комментирование
+            // Вызываем у модели функцию комментирования
+            $commentResult = File::commentFile($params['filename'], $params['comment']);
+            if ($commentResult === true) {
+                echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode(['result' => 'fail', 'errorMessage' => $commentResult], JSON_UNESCAPED_UNICODE);
+            }
+        } else {
+            // Пользователь не авторизован - он не имеет прав
+            echo json_encode(['result' => 'fail', 'errorMessage' => 'Вы не авторизованы. Нет прав на комментирование'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+
+    public function actionViewFile(array $params)
+    {
+        if (empty($params['request_from_url'])) {
+            return;
+        }
+        $userInfo = User::getUserInfoByCookie();
+        if (!$userInfo['authorized']) {
+            // Не авторизованному - не отдаём
+            header('HTTP/1.0 403 Forbidden');
+            echo 'You are not authorised user!';
+            return;
+        }
+        // Нужно отдать картинку
+        $photoFilename = Config::getPhotosFolder() . '/' . $params['request_from_url'].'.jpg';
+        if (file_exists($photoFilename)) {
+            header("Content-Type: image/jpeg");
+            header("Content-Length: " . filesize($photoFilename));
+            echo file_get_contents($photoFilename);
+        }
+    }
 
 
 

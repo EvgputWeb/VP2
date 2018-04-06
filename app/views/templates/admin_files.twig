@@ -22,12 +22,11 @@
                     <table>
                         {% for file in files %}
                             <tr>
-                                <td><img src="/admin/thumbs/{{ file.filename }}" alt=""></td>
-                                <td>{{ file.comment }}</td>
-
-                                <td width="250px">
-                                    <a href="/admin/viewfile" data-filename='{{ file.filename }}'>Просмотр</a>
-                                    <a href="/admin/commentfile" data-filename='{{ file.filename }}'>Комментарии</a>
+                                <td width="240px"><img src="/admin/thumbs/{{ file.filename }}" alt=""></td>
+                                <td><p class="comment-to-file" data-filename='{{ file.filename }}'>{{ file.comment }}</p></td>
+                                <td width="250px" class="file-controls">
+                                    <a href="/admin/viewfile/{{ file.filename }}">Просмотр</a><br>
+                                    <a href="/admin/commentfile" data-filename='{{ file.filename }}'>Комментарии</a><br>
                                     <a href="/admin/deletefile" data-filename='{{ file.filename }}'>Удалить</a>
                                 </td>
                             </tr>
