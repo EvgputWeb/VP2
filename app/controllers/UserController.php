@@ -128,7 +128,6 @@ class UserController extends Controller
     }
 
 
-
     public function actionPhoto(array $params)
     {
         if (empty($params['request_from_url'])) {
@@ -154,7 +153,7 @@ class UserController extends Controller
     }
 
 
-    public function actionMainPhoto()
+    public function actionMainPhoto($id)
     {
         $userInfo = User::getUserInfoByCookie();
         if (!$userInfo['authorized']) { // Не авторизованному - не отдаём
@@ -162,7 +161,10 @@ class UserController extends Controller
             echo 'You are not authorized user!';
             return;
         }
-        $photoFilename = Config::getPhotosFolder() . '/mainphoto_' . $userInfo['id'] . '.jpg';
+
+        (empty($id)) ? ($userId = $userInfo['id'] ) : ( $userId = $id['request_from_url'] );
+
+        $photoFilename = Config::getPhotosFolder() . '/mainphoto_' . $userId . '.jpg';
         if (!file_exists($photoFilename)) {
             $photoFilename = Config::getPhotosFolder() . '/empty_user.jpg';
         }

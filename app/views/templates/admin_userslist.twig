@@ -1,5 +1,12 @@
 {% include('common/_header.twig') %}
 
+{% macro declension(number, forms) %}
+    {% set cases = [2, 0, 1, 1, 1, 2] %}
+    {{ number }} {{ forms[ ( number%100>4 and number%100<20)? 2 : cases[(number%10<5)?number%10:5] ] }}
+{% endmacro %}
+
+{% import _self as utils %}
+
     <!--*************************************************************************************-->
     <div class="main"> <!-- доп.обёртка для прижатия футера -->
 
@@ -11,19 +18,20 @@
                 {% include('common/_admin_info.twig') %}
 
                 <div class="admin-control-area">
-                    <div class="admin-files-header">
-                        <h2>СПИСОК ПОЛЬЗОВАТЕЛЕЙ <a href="/admin/userslist">По возрасту n->N</a><a href="/admin/userslist/desc">По возрасту N->n</a> </h2>
+                    <div class="admin-list-header">
+                        <h2>СПИСОК ПОЛЬЗОВАТЕЛЕЙ</h2>
+                        <span>По возрасту:<a href="/admin/userslist">▲</a><a href="/admin/userslist/desc">▼</a></span>
                     </div>
 
-                    <table>
+                    <table class="table-admin-users-list">
                         {% for user in users %}
-                            <tr>
-                                <td>{{ user.login }}</td>
-                                <td>{{ user.name }}</td>
-                                <td>{{ user.age }}</td>
+                            <tr class="userslist-user-info">
+                                <td width="140"><img src="/user/mainphoto/{{ user.id }}" alt="" width="100"></td>
+                                <td width="37%" style="padding-left: 25px;">{{ user.login }}</td>
+                                <td width="33%">{{ user.name }}</td>
+                                <td width="20%" align="right">{{ utils.declension(user.age, ['год','года','лет']) }}</td>
                             </tr>
                         {% endfor %}
-
                     </table>
 
                 </div>

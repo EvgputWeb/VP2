@@ -519,7 +519,7 @@ a.big-btn:hover {
     background-color: #8abfd0;
 }
 
-.admin-files-header {
+.admin-list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -528,17 +528,17 @@ a.big-btn:hover {
     position: relative;
 }
 
-.admin-files-header h2 {
+.admin-list-header h2 {
     color: #8496bf;
     font-size: 26px;
     display: inline-block;
 }
 
-.admin-files-header form {
+.admin-list-header form {
     margin-top: 8px;
 }
 
-.admin-files-header::after {
+.admin-list-header::after {
     content: "";
     display: block;
     width: calc(100% - 80px);
@@ -598,4 +598,36 @@ p.comment-to-file {
 
 a:focus {
     outline: none;
+}
+
+.userslist-user-info {
+    font-size: 25px;
+    color: #208680;
+}
+
+.admin-list-header span {
+    display: inline-block;
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7a86a0;
+    font-size: 18px;
+}
+
+.admin-list-header span a {
+    display: inline-block;
+    text-decoration: none;
+    color: #859cd2;
+    margin: 0;
+    margin-left: 10px;
+}
+
+.admin-list-header span a:hover {
+    color: #38289a;
+}
+
+.table-admin-users-list {
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
