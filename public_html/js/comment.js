@@ -1,14 +1,27 @@
+function htmlUnescape(str){
+    return str
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+}
+
+
 $('body').on('click', 'a[href*=commentfile]', function(e) {
     e.preventDefault();
 
     var filename = $(this).data('filename');
     var selector = ".comment-to-file[data-filename='"+filename+"']";
-    var curcomment = $(selector).text();
+    var curcomment = $(selector).html();
+
+    var regex = /<br\s*[\/]?>/gi;
+    curcomment = htmlUnescape(curcomment.replace(regex, "\n"));
 
     swal({
         input: 'textarea',
         inputPlaceholder: 'Комментарии к фотографии',
-        inputValue: curcomment,
+        inputValue: htmlUnescape(curcomment),
         showCancelButton: true,
         confirmButtonColor: '#619c34',
         confirmButtonText: 'Сохранить',

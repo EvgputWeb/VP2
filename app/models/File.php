@@ -17,6 +17,10 @@ class File extends Model
         $filesList = self::query()
             ->where('user_id','=', $userId)->get(['filename','comment'])
             ->sortByDesc('filename')->toArray();
+        foreach ($filesList as $k => $item) {
+            $filesList[$k]['comment'] = html_entity_decode($filesList[$k]['comment']);
+            $filesList[$k]['comment'] = mb_ereg_replace('\n', '<br>', $filesList[$k]['comment']);
+        }
         return $filesList;
     }
 

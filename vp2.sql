@@ -17,6 +17,17 @@ DROP DATABASE IF EXISTS `Loftschool_VP2`;
 CREATE DATABASE IF NOT EXISTS `Loftschool_VP2` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `Loftschool_VP2`;
 
+-- Дамп структуры для таблица Loftschool_VP2.files
+DROP TABLE IF EXISTS `files`;
+CREATE TABLE IF NOT EXISTS `files` (
+  `user_id` int(10) unsigned NOT NULL,
+  `filename` varchar(50) NOT NULL,
+  `comment` varchar(500) DEFAULT NULL,
+  KEY `FK_files_users` (`user_id`),
+  CONSTRAINT `FK_files_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Экспортируемые данные не выделены.
 -- Дамп структуры для таблица Loftschool_VP2.users
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
@@ -28,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password_hash` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `login` (`login`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 -- Экспортируемые данные не выделены.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
