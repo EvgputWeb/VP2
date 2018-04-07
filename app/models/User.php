@@ -148,9 +148,13 @@ class User extends Model
         return true;
     }
 
-    public static function getUsersList()
+    public static function getUsersList($sort)
     {
-        return self::all()->sortBy('age')->toArray();
+        if ($sort=='desc') {
+            return self::all()->sortByDesc('age')->toArray();
+        } else {
+            return self::all()->sortBy('age')->toArray();
+        }
     }
 
 }

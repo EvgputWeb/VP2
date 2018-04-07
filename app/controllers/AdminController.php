@@ -174,21 +174,13 @@ class AdminController extends Controller
     {
         $this->checkAuth();
 
-        /*if (count($params) > 0) {
-            // Прилетели данные от пользователя
-            if (isset($params['submit']) && (!empty($_FILES['photo']['tmp_name']))) {
-                File::saveUploadedFile($this->userInfo['id'], $_FILES['photo']['tmp_name']);
-                unlink($_FILES['photo']['tmp_name']);
-                $this->viewData['files'] = File::getFilesListOf($this->userInfo['id']);
-                header('Location: /admin/myfiles'); // чтобы _POST и _FILES очистились
-                return;
-            }
-        } */
-
+        if (isset($params['request_from_url']) && ($params['request_from_url']=='desc')) {
+            $this->viewData['users'] = User::getUsersList('desc');
+        } else {
+            $this->viewData['users'] = User::getUsersList('');
+        }
         // Показываем список пользователей
-        $this->viewData['users'] = User::getUsersList();
         $this->view->render('admin_userslist', $this->viewData);
-
     }
 
 }
