@@ -27,9 +27,16 @@
                         {% for user in users %}
                             <tr class="userslist-user-info">
                                 <td width="140"><img src="/user/mainphoto/{{ user.id }}" alt="" width="100"></td>
-                                <td width="37%" style="padding-left: 25px;">{{ user.login }}</td>
-                                <td width="33%">{{ user.name }}</td>
-                                <td width="20%" align="right">{{ utils.declension(user.age, ['год','года','лет']) }}</td>
+                                <td width="40%" style="padding-left: 25px;">
+                                    {{ user.login }}<br>
+                                    {% if (user.age < 18) %}
+                                        <span class="age-below-18">Несовершеннолетний</span>
+                                    {% else %}
+                                        <span>Совершеннолетний</span>
+                                    {% endif %}
+                                </td>
+                                <td width="32%">{{ user.name }}</td>
+                                <td width="18%" align="right">{{ utils.declension(user.age, ['год','года','лет']) }}</td>
                             </tr>
                         {% endfor %}
                     </table>

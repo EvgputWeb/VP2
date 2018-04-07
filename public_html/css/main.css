@@ -631,3 +631,14 @@ a:focus {
     margin-top: 10px;
     margin-bottom: 20px;
 }
+
+.table-admin-users-list td span {
+    font-size: 17px;
+    color: #97b397;
+}
+
+.table-admin-users-list td span.age-below-18 {
+    color: #ea9090;
+}
+
+
