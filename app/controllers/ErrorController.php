@@ -8,7 +8,7 @@ class ErrorController extends Controller
 {
     public function actionIndex()
     {
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
 
         $viewData['errorMessage'] = '404 - страницы не существует';
 
@@ -20,4 +20,3 @@ class ErrorController extends Controller
         }
     }
 }
-

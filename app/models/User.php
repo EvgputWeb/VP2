@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Eloquent\Model;
-use Intervention\Image\ImageManagerStatic as Image;
-
 
 class User extends Model
 {
@@ -12,15 +10,8 @@ class User extends Model
     public static $userDataFields = ['name', 'age', 'description', 'login', 'password', 'password-again'];
 
 
-    public function Register($userData)
+    public function CreateNewUser($userData)
     {
-        // Проверка: логин должен быть уникальным
-        $login = strtolower($userData['login']);
-        $user = $this->query()->whereRaw('lcase(login) = ?', $login)->get(['id'])->toArray();
-        if (!empty($user)) {
-            return 'Пользователь с таким логином уже есть';
-        }
-        // Нет такого пользователя. Создаём.
         $user = $this->query()->create([
             'name' => htmlspecialchars($userData['name']),
             'age' => intval($userData['age']),
@@ -28,49 +19,36 @@ class User extends Model
             'login' => htmlspecialchars($userData['login']),
             'password_hash' => password_hash($userData['password'], PASSWORD_BCRYPT)
         ]);
-        // Записали юзера в базу
-        $userId = $user->id;
-        // Если есть фотка, то помещаем её в папку для фоток с именем "mainphoto_".$userId."jpg"
-        if (isset($userData['photo_filename'])) {
-            self::saveUserPhoto($userId, $userData['photo_filename']);
-        }
-        // Отдаём userId только что зарегистрированного пользователя
-        return intval($userId);
+        // Отдаём userId
+        return $user->id;
     }
 
 
-    public function Auth($userData)
+    public function isLoginExists($login)
     {
-        $login = strtolower($userData['login']);
-        $user = $this->query()->whereRaw('lcase(login) = ?', $login)->get(['id', 'password_hash'])->toArray();
-        if (empty($user)) {
-            return 'Пользователь с таким логином не найден';
-        }
-        // Логин найден - проверяем пароль
-        if (password_verify($userData['password'], $user[0]['password_hash'])) {
-            // Успешная авторизация - отдаём userId
-            return intval($user[0]['id']);
-        } else {
-            return 'Неверный пароль';
-        }
+        $user = $this->query()->whereRaw('lcase(login) = ?', strtolower($login))->get(['id'])->toArray();
+        return (!empty($user));
     }
 
 
-    public static function encryptUserId($id)
+    public function getPasswordHash($login)
     {
-        return openssl_encrypt($id, 'AES-128-ECB', Config::getCookieCryptPassword());
+        $user = $this->query()->whereRaw('lcase(login) = ?', strtolower($login))->get(['id', 'password_hash'])->toArray();
+        return $user[0]['password_hash'];
     }
 
-    public static function decryptUserId($cryptedId)
+
+    public function getUserId($login)
     {
-        return openssl_decrypt($cryptedId, 'AES-128-ECB', Config::getCookieCryptPassword());
+        $user = $this->query()->whereRaw('lcase(login) = ?', strtolower($login))->get(['id', 'password_hash'])->toArray();
+        return $user[0]['id'];
     }
 
 
     public static function getUserInfoById($id)
     {
         $userInfo = [];
-        $user = static::query()->find($id, ['name', 'login', 'age', 'description']);
+        $user = self::query()->find($id, ['name', 'login', 'age', 'description']);
         if (!empty($user)) {
             $user = $user->toArray();
             $userInfo['name'] = html_entity_decode($user['name']);
@@ -82,59 +60,15 @@ class User extends Model
     }
 
 
-    public static function getUserInfoByCookie()
+    public static function encryptUserId($id, $password)
     {
-        $userInfo = [];
-        $userInfo['authorized'] = false;
-        if (!isset($_COOKIE['user_id'])) { // Это незалогиненный пользователь
-            return $userInfo;
-        }
-        // Это авторизованный пользователь.
-        // Возвращаем его имя и логин, которые берём из базы
-        $userInfo['authorized'] = true;
-
-        // Расшифровываем id пользователя из куки
-        $cryptedUserId = $_COOKIE['user_id'];
-        $userInfo['id'] = self::decryptUserId($cryptedUserId);
-
-        $usrInf = self::getUserInfoById($userInfo['id']);
-
-        if (empty($usrInf)) {
-            // Упс... А пользователя такого нету...
-            $userInfo = [];
-            $userInfo['authorized'] = false;
-            return $userInfo;
-        }
-        return array_merge($userInfo, $usrInf);
+        return openssl_encrypt($id, 'AES-128-ECB', $password);
     }
 
 
-    public static function saveUserPhoto($userId, $tmpFileName)
+    public static function decryptUserId($cryptedId, $password)
     {
-        if (empty($tmpFileName)) {
-            return false;
-        }
-        Image::configure(array('driver' => 'gd'));
-        $img = Image::make($tmpFileName);
-        // Вырезаем область в пропорции 3x4
-        $img->crop( round(0.75*$img->height()), $img->height());
-        $img->crop( $img->width(), round(1.33333*$img->width()));
-        if ($img->width()>300) {
-            $img->resize(300, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-        }
-        // Сохраняем в папку с фотками пользователей
-        if (!file_exists(Config::getPhotosFolder())) {
-            mkdir(Config::getPhotosFolder(), 0777);
-        }
-        if (!file_exists(Config::getPhotosFolder().'/thumbs')) {
-            mkdir(Config::getPhotosFolder().'/thumbs', 0777);
-        }
-        $img->save(Config::getPhotosFolder().'/mainphoto_'. $userId .'.jpg',90);
-        // Удаляем временный файл
-        unlink($tmpFileName);
-        return true;
+        return openssl_decrypt($cryptedId, 'AES-128-ECB', $password);
     }
 
 
@@ -148,13 +82,13 @@ class User extends Model
         return true;
     }
 
+
     public static function getUsersList($sort)
     {
-        if ($sort=='desc') {
+        if ($sort == 'desc') {
             return self::all()->sortByDesc('age')->toArray();
         } else {
             return self::all()->sortBy('age')->toArray();
         }
     }
-
 }

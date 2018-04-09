@@ -8,7 +8,7 @@ class MainController extends Controller
 {
     public function actionIndex()
     {
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
 
         $viewData = ['curSection' => ''];
 

@@ -13,7 +13,7 @@ class AdminController extends Controller
 
     private function checkAuth()
     {
-        $this->userInfo = User::getUserInfoByCookie();
+        $this->userInfo = self::getUserInfoByCookie();
         if (!$this->userInfo['authorized']) {
             // Надо авторизоваться
             header('Location: /user/auth');
@@ -61,7 +61,7 @@ class AdminController extends Controller
         if (empty($params['request_from_url'])) {
             return;
         }
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
         if (!$userInfo['authorized']) {
             // Не авторизованному - не отдаём
             header('HTTP/1.0 403 Forbidden');
@@ -84,7 +84,7 @@ class AdminController extends Controller
             echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);
             return;
         }
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
         if ($userInfo['authorized']) { // Это авторизованный пользователь - он имеет права на удаление
             // Вызываем у модели функцию удаления
             $deleteFileResult = File::deleteFile($params['filename']);
@@ -106,7 +106,7 @@ class AdminController extends Controller
             echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);
             return;
         }
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
         if ($userInfo['authorized']) { // Это авторизованный пользователь - он имеет права на комментирование
             // Вызываем у модели функцию комментирования
             $commentResult = File::commentFile($params['filename'], $params['comment']);
@@ -127,7 +127,7 @@ class AdminController extends Controller
         if (empty($params['request_from_url'])) {
             return;
         }
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
         if (!$userInfo['authorized']) {
             // Не авторизованному - не отдаём
             header('HTTP/1.0 403 Forbidden');
@@ -150,7 +150,7 @@ class AdminController extends Controller
             echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);
             return;
         }
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
         if ($userInfo['authorized']) { // Это авторизованный пользователь - он имеет права на редактирование
             if ($params['userId'] != $userInfo['id']) {  // Почему-то не совпало ...
                 echo json_encode(['result' => 'fail', 'errorMessage' => 'Неверный запрос'], JSON_UNESCAPED_UNICODE);

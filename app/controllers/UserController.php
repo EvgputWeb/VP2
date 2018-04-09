@@ -3,7 +3,9 @@
 require_once 'Controller.php';
 require_once APP . '/models/User.php';
 
+
 use ReCaptcha\ReCaptcha;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class UserController extends Controller
 {
@@ -11,6 +13,7 @@ class UserController extends Controller
     {
         parent::__construct();
         $this->model = new User();
+        Image::configure(array('driver' => 'gd'));
     }
 
 
@@ -44,31 +47,30 @@ class UserController extends Controller
             $userData['password'] = trim($userData['password']);
             $userData['password-again'] = trim($userData['password-again']);
 
-            // Если есть фотка, то добавляем в данные пользователя имя загруженного файла
-            if (isset($_FILES['photo'])) {
-                $userData['photo_filename'] = $_FILES['photo']['tmp_name'];
-            }
-
             // Проверяем параметры на корректность
             $checkParamsResult = $this->checkRegisterParams($userData['login'], $userData['password'], $userData['password-again']);
 
             if ($checkParamsResult === true) {
                 // Входные параметры - OK.  Обращаемся к модели пользователя - регистрируем его
-                $userId = $this->model->Register($userData);
-
-                if (is_int($userId)) {
-                    setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
-
-                    // После сообщения об успешной регистрации - автоматически перейдём в админ панель через 3 секунды
+                if ($this->model->isLoginExists($userData['login'])) {
+                    // Пользователь с таким логином уже есть
+                    header('refresh: 2; url=/register');
+                    $viewData['errorMessage'] = 'Пользователь с таким логином уже есть';
+                    $this->view->render('error', $viewData);
+                } else {
+                    $userId = $this->model->CreateNewUser($userData);
+                    // Если есть фотка, то помещаем её в папку для фоток с именем "mainphoto_".$userId."jpg"
+                    if (isset($_FILES['photo'])) {
+                        $this->saveUserPhoto($userId, $_FILES['photo']['tmp_name']);
+                    }
+                    setcookie('user_id', User::encryptUserId($userId, Config::getCookieCryptPassword()), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
+                    // После сообщения об успешной регистрации - автоматически перейдём в админ панель через 2 секунды
                     header('refresh: 2; url=/admin');
                     $viewData['successMessage'] = "Поздравляем! Регистрация прошла успешно!<br>Ваш логин:&nbsp; <b>{$userData['login']}</b>";
                     $this->view->render('success', $viewData);
-                } else {
-                    header('refresh: 2; url=/register');
-                    $viewData['errorMessage'] = (string)$userId;
-                    $this->view->render('error', $viewData);
                 }
             } else {
+                // Некорректные входные параметры
                 header('refresh: 2; url=/register');
                 $viewData['errorMessage'] = $checkParamsResult;
                 $this->view->render('error', $viewData);
@@ -102,18 +104,24 @@ class UserController extends Controller
             $userData['login'] = isset($params['login']) ? strtolower(trim($params['login'])) : '';
             $userData['password'] = isset($params['password']) ? trim($params['password']) : '';
 
-            // Обращаемся к модели пользователя - авторизуем его
-            $userId = $this->model->Auth($userData);
-
-            if (is_int($userId)) {
-                setcookie('user_id', User::encryptUserId($userId), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
-                // После приветствия - автоматически перейдём в админ панель через 3 секунды
-                header('refresh: 2; url=/admin');
-                $userInfo = User::getUserInfoById($userId);
-                $viewData['successMessage'] = "Привет,&nbsp; <b>{$userInfo['name']}</b> !";
-                $this->view->render('success', $viewData);
+            if ($this->model->isLoginExists($userData['login'])) {
+                // Логин найден - проверяем пароль
+                $pwhash = $this->model->getPasswordHash($userData['login']);
+                if (password_verify($userData['password'], $pwhash)) {
+                    // Успешная авторизация
+                    $userId = $this->model->getUserId($userData['login']);
+                    setcookie('user_id', User::encryptUserId($userId, Config::getCookieCryptPassword()), time() + Config::getCookieLiveTime(), '/', $_SERVER['SERVER_NAME']);
+                    // После приветствия - автоматически перейдём в админ панель через 2 секунды
+                    header('refresh: 2; url=/admin');
+                    $userInfo = User::getUserInfoById($userId);
+                    $viewData['successMessage'] = "Привет,&nbsp; <b>{$userInfo['name']}</b> !";
+                    $this->view->render('success', $viewData);
+                } else {
+                    $viewData['errorMessage'] = 'Неверный пароль';
+                    $this->view->render('error', $viewData);
+                }
             } else {
-                $viewData['errorMessage'] = (string)$userId;
+                $viewData['errorMessage'] = 'Пользователь с таким логином не найден';
                 $this->view->render('error', $viewData);
             }
         }
@@ -123,7 +131,6 @@ class UserController extends Controller
     public function actionLogout()
     {
         setcookie('user_id', '', time() - 5, '/', $_SERVER['SERVER_NAME']);
-        // После приветствия - автоматически перейдём в админ панель через 3 секунды
         header('Location: /');
     }
 
@@ -133,7 +140,7 @@ class UserController extends Controller
         if (empty($params['request_from_url'])) {
             return;
         }
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
         if (!$userInfo['authorized']) {
             // Не авторизованному - не отдаём
             header('HTTP/1.0 403 Forbidden');
@@ -155,14 +162,14 @@ class UserController extends Controller
 
     public function actionMainPhoto($id)
     {
-        $userInfo = User::getUserInfoByCookie();
+        $userInfo = self::getUserInfoByCookie();
         if (!$userInfo['authorized']) { // Не авторизованному - не отдаём
             header('HTTP/1.0 403 Forbidden');
             echo 'You are not authorized user!';
             return;
         }
 
-        (empty($id)) ? ($userId = $userInfo['id'] ) : ( $userId = $id['request_from_url'] );
+        (empty($id)) ? ($userId = $userInfo['id']) : ($userId = $id['request_from_url']);
 
         $photoFilename = Config::getPhotosFolder() . '/mainphoto_' . $userId . '.jpg';
         if (!file_exists($photoFilename)) {
@@ -208,4 +215,32 @@ class UserController extends Controller
         return false;
     }
 
+
+    private function saveUserPhoto($userId, $tmpFileName)
+    {
+        if (empty($tmpFileName)) {
+            return false;
+        }
+
+        $img = Image::make($tmpFileName);
+        // Вырезаем область в пропорции 3x4
+        $img->crop(round(0.75 * $img->height()), $img->height());
+        $img->crop($img->width(), round(1.33333 * $img->width()));
+        if ($img->width() > 300) {
+            $img->resize(300, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+        }
+        // Сохраняем в папку с фотками пользователей
+        if (!file_exists(Config::getPhotosFolder())) {
+            mkdir(Config::getPhotosFolder(), 0777);
+        }
+        if (!file_exists(Config::getPhotosFolder() . '/thumbs')) {
+            mkdir(Config::getPhotosFolder() . '/thumbs', 0777);
+        }
+        $img->save(Config::getPhotosFolder() . '/mainphoto_' . $userId . '.jpg', 90);
+        // Удаляем временный файл
+        unlink($tmpFileName);
+        return true;
+    }
 }
