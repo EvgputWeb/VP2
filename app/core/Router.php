@@ -2,6 +2,8 @@
 
 namespace EvgputWeb\MVC\Core;
 
+use EvgputWeb\MVC\Controllers\ErrorController;
+
 
 abstract class Router
 {
