@@ -16,7 +16,7 @@ require_once ROOT . '/vendor/autoload.php';
 
 use EvgputWeb\MVC\Core\Config;
 use EvgputWeb\MVC\Core\Db;
-use EvgputWeb\MVC\Controllers\Router;
+use EvgputWeb\MVC\Core\Router;
 
 
 // Загружаем конфигурацию

@@ -1,6 +1,6 @@
 <?php
 
-namespace EvgputWeb\MVC\Controllers;
+namespace EvgputWeb\MVC\Core;
 
 
 abstract class Router
