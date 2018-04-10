@@ -1,5 +1,8 @@
 <?php
 
+namespace EvgputWeb\MVC\Controllers;
+
+
 abstract class Router
 {
     public static function run()
@@ -24,28 +27,22 @@ abstract class Router
         // иначе - сообщение об ошибке
 
         $error = false;
-        $filename = APP . '/controllers/' . $controllerName . '.php';
+        $fullClassName = 'EvgputWeb\\MVC\\Controllers\\'.$controllerName;
 
-        if (file_exists($filename)) {
-            require_once $filename;
-
-            if (class_exists($controllerName)) {
-                $controller = new $controllerName();
-                if (method_exists($controller, $actionName)) {
-                    $params = $_POST;
-                    if (!empty($routes[3])) {
-                        $params['request_from_url'] = $routes[3];
-                    }
-                    // Обезопасиваем входные параметры
-                    $actionParams = [];
-                    foreach ($params as $key => $value) {
-                        $actionParams[$key] = htmlspecialchars($value, ENT_QUOTES);
-                    }
-                    // Вызываем действие и передаем параметры из _POST
-                    $controller->$actionName($actionParams);
-                } else {
-                    $error = true;
+        if (class_exists($fullClassName)) {
+            $controller = new $fullClassName();
+            if (method_exists($controller, $actionName)) {
+                $params = $_POST;
+                if (!empty($routes[3])) {
+                    $params['request_from_url'] = $routes[3];
                 }
+                // Обезопасиваем входные параметры
+                $actionParams = [];
+                foreach ($params as $key => $value) {
+                    $actionParams[$key] = htmlspecialchars($value, ENT_QUOTES);
+                }
+                // Вызываем действие и передаем параметры из _POST
+                $controller->$actionName($actionParams);
             } else {
                 $error = true;
             }
@@ -54,7 +51,6 @@ abstract class Router
         }
 
         if ($error) {
-            require_once APP . '/controllers/ErrorController.php';
             $controller = new ErrorController();
             $controller->actionIndex();
             return;

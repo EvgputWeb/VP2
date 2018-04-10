@@ -1,9 +1,9 @@
 <?php
 
+namespace EvgputWeb\MVC\Models;
+
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManagerStatic as Image;
-
-require_once 'User.php';
 
 
 class File extends Model

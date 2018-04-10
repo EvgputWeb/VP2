@@ -7,6 +7,12 @@
         "intervention/image": "^2.4"
     },
     "autoload": {
-        "psr-4": {  }
+        "psr-4": {
+          "EvgputWeb\\MVC\\Controllers\\": "app/controllers",
+          "EvgputWeb\\MVC\\Core\\": "app/core",
+          "EvgputWeb\\MVC\\Models\\": "app/models",
+          "EvgputWeb\\MVC\\Views\\": "app/views"
+        }
+
     }
 }

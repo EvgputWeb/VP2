@@ -1,4 +1,8 @@
 <?php
+// FRONT CONTROLLER
+
+define('ROOT', realpath(__DIR__ . '/..'));
+define('APP', ROOT . '/app');
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -6,19 +10,13 @@ error_reporting(E_ALL);
 mb_internal_encoding("UTF-8");
 mb_regex_encoding("UTF-8");
 
-define('ROOT', realpath(__DIR__ . '/..'));
-define('APP', ROOT . '/app');
-define('PUBLIC_HTML', ROOT . '/public_html');
-
-// FRONT CONTROLLER
-
-// Подключение файлов ядра
-require_once APP . '/core/Config.php';
-require_once APP . '/core/Db.php';
-require_once APP . '/core/Router.php';
 
 // Автозагрузка
 require_once ROOT . '/vendor/autoload.php';
+
+use EvgputWeb\MVC\Core\Config;
+use EvgputWeb\MVC\Core\Db;
+use EvgputWeb\MVC\Controllers\Router;
 
 
 // Загружаем конфигурацию

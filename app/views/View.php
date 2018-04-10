@@ -1,5 +1,10 @@
 <?php
 
+namespace EvgputWeb\MVC\Views;
+
+use Twig_Loader_Filesystem;
+use Twig_Environment;
+
 
 class View
 {

@@ -1,11 +1,13 @@
 <?php
 
-require_once 'Controller.php';
-require_once APP . '/models/User.php';
+namespace EvgputWeb\MVC\Controllers;
 
+use EvgputWeb\MVC\Models\User;
+use EvgputWeb\MVC\Core\Config;
 
 use ReCaptcha\ReCaptcha;
 use Intervention\Image\ImageManagerStatic as Image;
+
 
 class UserController extends Controller
 {

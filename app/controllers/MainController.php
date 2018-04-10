@@ -1,7 +1,6 @@
 <?php
 
-require_once 'Controller.php';
-require_once APP . '/models/User.php';
+namespace EvgputWeb\MVC\Controllers;
 
 
 class MainController extends Controller

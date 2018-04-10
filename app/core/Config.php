@@ -1,5 +1,8 @@
 <?php
 
+namespace EvgputWeb\MVC\Core;
+
+
 abstract class Config
 {
     private static $cfg;

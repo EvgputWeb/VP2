@@ -1,8 +1,10 @@
 <?php
 
-require_once 'Controller.php';
-require_once APP . '/models/User.php';
-require_once APP . '/models/File.php';
+namespace EvgputWeb\MVC\Controllers;
+
+use EvgputWeb\MVC\Core\Config;
+use EvgputWeb\MVC\Models\File;
+use EvgputWeb\MVC\Models\User;
 
 
 class AdminController extends Controller

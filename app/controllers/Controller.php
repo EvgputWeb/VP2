@@ -1,7 +1,10 @@
 <?php
 
-require_once APP . '/views/View.php';
-require_once APP . '/models/User.php';
+namespace EvgputWeb\MVC\Controllers;
+
+use EvgputWeb\MVC\Views\View;
+use EvgputWeb\MVC\Models\User;
+use EvgputWeb\MVC\Core\Config;
 
 
 abstract class Controller
